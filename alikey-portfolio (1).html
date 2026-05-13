@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alikey — UGC Creator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sand: #e8dcc8;
+    --dune: #c9b99a;
+    --clay: #a07850;
+    --earth: #6b4f35;
+    --ocean: #4a7c8a;
+    --foam: #f5f0e8;
+    --bark: #3a2e22;
+    --sage: #8a9e8c;
+    --rust: #b8623a;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--foam);
+    color: var(--bark);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ── GRAIN OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 4rem;
+    background: rgba(245, 240, 232, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(169, 120, 80, 0.12);
+  }
+
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    color: var(--earth);
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    text-decoration: none;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--clay);
+    transition: color 0.3s;
+  }
+
+  .nav-links a:hover { color: var(--earth); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8rem 4rem 4rem 6rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-tag {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--clay);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    animation: fadeUp 0.8s ease 0.2s both;
+  }
+
+  .hero-tag::before {
+    content: '';
+    display: inline-block;
+    width: 2rem;
+    height: 1px;
+    background: var(--clay);
+  }
+
+  .hero-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3.5rem, 7vw, 6rem);
+    font-weight: 300;
+    line-height: 1.05;
+    color: var(--bark);
+    margin-bottom: 0.3rem;
+    animation: fadeUp 0.8s ease 0.35s both;
+  }
+
+  .hero-name em {
+    font-style: italic;
+    color: var(--clay);
+  }
+
+  .hero-handle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+    font-style: italic;
+    color: var(--dune);
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.8s ease 0.45s both;
+  }
+
+  .hero-desc {
+    font-size: 1rem;
+    line-height: 1.85;
+    color: var(--earth);
+    max-width: 420px;
+    margin-bottom: 3rem;
+    animation: fadeUp 0.8s ease 0.55s both;
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    animation: fadeUp 0.8s ease 0.65s both;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    padding: 0.9rem 2.2rem;
+    background: var(--earth);
+    color: var(--foam);
+    text-decoration: none;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    border: 1px solid var(--earth);
+  }
+
+  .btn-primary:hover {
+    background: transparent;
+    color: var(--earth);
+  }
+
+  .btn-secondary {
+    display: inline-block;
+    padding: 0.9rem 2.2rem;
+    background: transparent;
+    color: var(--clay);
+    text-decoration: none;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border: 1px solid var(--dune);
+    transition: all 0.3s;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--clay);
+    color: var(--earth);
+  }
+
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-image-area {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--dune) 0%, var(--clay) 40%, var(--earth) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-image-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    animation: fadeIn 1s ease 0.8s both;
+  }
+
+  .hero-waves {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    overflow: hidden;
+  }
+
+  .hero-waves svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ── STATS ── */
+  .stats-bar {
+    background: var(--earth);
+    padding: 2rem 6rem;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .stat-item {
+    text-align: center;
+    color: var(--foam);
+  }
+
+  .stat-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.4rem;
+    font-weight: 300;
+    display: block;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--dune);
+    margin-top: 0.4rem;
+  }
+
+  .stat-divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(245,240,232,0.2);
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 6rem 6rem;
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--clay);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-label::before {
+    content: '';
+    display: inline-block;
+    width: 2rem;
+    height: 1px;
+    background: var(--clay);
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 300;
+    line-height: 1.15;
+    color: var(--bark);
+    margin-bottom: 3rem;
+  }
+
+  .section-title em {
+    font-style: italic;
+    color: var(--clay);
+  }
+
+  /* ── ABOUT ── */
+  #about {
+    background: var(--foam);
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 6rem;
+    align-items: center;
+  }
+
+  .about-image-box {
+    position: relative;
+    height: 520px;
+  }
+
+  .about-img-main {
+    position: absolute;
+    top: 0; left: 0;
+    width: 78%;
+    height: 88%;
+    overflow: hidden;
+  }
+
+  .about-img-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+  }
+
+  .about-img-accent {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 55%;
+    height: 50%;
+    overflow: hidden;
+    border: 4px solid var(--foam);
+  }
+
+  .about-img-accent img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .about-content p {
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: var(--earth);
+    margin-bottom: 1.5rem;
+  }
+
+  .languages {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .lang-tag {
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--dune);
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--clay);
+  }
+
+  /* ── NICHES ── */
+  #niches {
+    background: var(--sand);
+  }
+
+  .niches-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .niche-card {
+    background: var(--foam);
+    padding: 2.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: default;
+  }
+
+  .niche-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--clay);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+
+  .niche-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(107,79,53,0.12);
+  }
+
+  .niche-card:hover::after { transform: scaleX(1); }
+
+  .niche-emoji {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .niche-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--bark);
+    margin-bottom: 0.6rem;
+  }
+
+  .niche-desc {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--earth);
+  }
+
+  /* ── PORTFOLIO ── */
+  #portfolio {
+    background: var(--foam);
+  }
+
+  .portfolio-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+    margin-bottom: 4rem;
+  }
+
+  .portfolio-text p {
+    font-size: 1rem;
+    line-height: 1.85;
+    color: var(--earth);
+  }
+
+  .portfolio-links {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .platform-link {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1rem 1.5rem;
+    border: 1px solid var(--dune);
+    text-decoration: none;
+    color: var(--earth);
+    font-size: 0.85rem;
+    transition: all 0.3s;
+    background: transparent;
+  }
+
+  .platform-link:hover {
+    background: var(--earth);
+    color: var(--foam);
+    border-color: var(--earth);
+  }
+
+  .platform-link .platform-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .platform-link .platform-name {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    flex: 1;
+  }
+
+  .platform-link .platform-arrow {
+    font-size: 0.8rem;
+    opacity: 0.5;
+  }
+
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .portfolio-item {
+    aspect-ratio: 9/16;
+    background: linear-gradient(160deg, var(--dune), var(--clay));
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+
+  .portfolio-item:nth-child(2) { background: linear-gradient(160deg, var(--ocean), var(--earth)); }
+  .portfolio-item:nth-child(3) { background: linear-gradient(160deg, var(--sage), var(--clay)); }
+  .portfolio-item:nth-child(4) { background: linear-gradient(160deg, var(--rust), var(--earth)); }
+  .portfolio-item:nth-child(5) { background: linear-gradient(160deg, var(--sand), var(--dune)); }
+  .portfolio-item:nth-child(6) { background: linear-gradient(160deg, var(--clay), var(--ocean)); }
+
+  .portfolio-item:hover { transform: scale(1.02); }
+
+  .portfolio-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(58, 46, 34, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--foam);
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .portfolio-item:hover .portfolio-overlay { opacity: 1; }
+
+  .portfolio-overlay .po-type {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    color: var(--dune);
+  }
+
+  .portfolio-overlay .po-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+  }
+
+  .portfolio-placeholder-text {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    color: rgba(245,240,232,0.6);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  /* ── BRANDS ── */
+  #brands {
+    background: var(--earth);
+    text-align: center;
+  }
+
+  #brands .section-label { justify-content: center; color: var(--dune); }
+  #brands .section-label::before { background: var(--dune); }
+  #brands .section-title { color: var(--foam); text-align: center; }
+
+  .brands-grid {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+  }
+
+  .brand-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    min-width: 200px;
+    max-width: 260px;
+    transition: transform 0.3s;
+  }
+
+  .brand-item:hover { transform: translateY(-4px); }
+
+  .brand-photo {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    border: 2px solid rgba(245,240,232,0.15);
+  }
+
+  .brand-item .brand-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    color: var(--foam);
+    font-weight: 300;
+    text-align: center;
+  }
+
+  .brand-item .brand-cat {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dune);
+    text-align: center;
+  }
+
+  .brands-note {
+    font-size: 0.85rem;
+    color: rgba(245,240,232,0.5);
+    font-style: italic;
+    margin-top: 1rem;
+  }
+
+  /* ── CONTENT TYPES ── */
+  #services {
+    background: var(--foam);
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--dune);
+    border: 1px solid var(--dune);
+  }
+
+  .service-item {
+    background: var(--foam);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    transition: background 0.3s, color 0.3s;
+    cursor: default;
+  }
+
+  .service-item:hover {
+    background: var(--clay);
+    color: var(--foam);
+  }
+
+  .service-item .si-icon { font-size: 1.8rem; margin-bottom: 1rem; display: block; }
+
+  .service-item .si-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    color: var(--bark);
+    margin-bottom: 0.6rem;
+    transition: color 0.3s;
+  }
+
+  .service-item:hover .si-title { color: var(--foam); }
+
+  .service-item .si-desc {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: var(--earth);
+    transition: color 0.3s;
+  }
+
+  .service-item:hover .si-desc { color: rgba(245,240,232,0.8); }
+
+  /* ── CONTACT ── */
+  #contact {
+    background: var(--sand);
+    text-align: center;
+    padding: 8rem 6rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #contact::before {
+    content: 'ALIKEY';
+    position: absolute;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18vw;
+    font-weight: 300;
+    color: rgba(169,120,80,0.06);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    pointer-events: none;
+    letter-spacing: 0.1em;
+  }
+
+  #contact .section-label { justify-content: center; }
+  #contact .section-title { margin-bottom: 1rem; }
+
+  .contact-sub {
+    font-size: 1rem;
+    color: var(--earth);
+    margin-bottom: 3rem;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.8;
+  }
+
+  .contact-email {
+    display: inline-block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    color: var(--earth);
+    text-decoration: none;
+    border-bottom: 1px solid var(--clay);
+    padding-bottom: 0.3rem;
+    transition: color 0.3s;
+    margin-bottom: 3rem;
+  }
+
+  .contact-email:hover { color: var(--clay); }
+
+  .social-row {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 1.4rem;
+    border: 1px solid var(--dune);
+    text-decoration: none;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--earth);
+    transition: all 0.3s;
+  }
+
+  .social-link:hover {
+    background: var(--earth);
+    color: var(--foam);
+    border-color: var(--earth);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--bark);
+    color: rgba(245,240,232,0.4);
+    padding: 2rem 6rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+  }
+
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    color: var(--dune);
+    font-weight: 300;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    nav { padding: 1.2rem 2rem; }
+    .nav-links { display: none; }
+
+    .hero { grid-template-columns: 1fr; min-height: auto; }
+    .hero-left { padding: 7rem 2rem 4rem; }
+    .hero-right { height: 50vw; }
+
+    .stats-bar { padding: 2rem; }
+
+    section { padding: 4rem 2rem; }
+
+    #about { grid-template-columns: 1fr; gap: 3rem; }
+    .about-image-box { height: 300px; }
+
+    .niches-grid { grid-template-columns: 1fr 1fr; }
+    .portfolio-grid { grid-template-columns: 1fr 1fr; }
+    .portfolio-intro { grid-template-columns: 1fr; }
+    .services-grid { grid-template-columns: 1fr 1fr; }
+
+    footer { flex-direction: column; gap: 1rem; text-align: center; padding: 2rem; }
+  }
+
+  @media (max-width: 600px) {
+    .niches-grid { grid-template-columns: 1fr; }
+    .portfolio-grid { grid-template-columns: 1fr; }
+    .services-grid { grid-template-columns: 1fr; }
+    .brands-grid { flex-direction: column; align-items: center; }
+    .stat-divider { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Alikey</a>
+  <ul class="nav-links">
+    <li><a href="#about">Sobre mí</a></li>
+    <li><a href="#niches">Nichos</a></li>
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#brands">Marcas</a></li>
+    <li><a href="#contact">Contacto</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-tag">UGC Creator · Cádiz, España</p>
+    <h1 class="hero-name">Alicia<br><em>Parrado</em></h1>
+    <p class="hero-handle">@alikey</p>
+    <p class="hero-desc">Creo contenido auténtico y visual para marcas que quieren conectar de verdad con su audiencia. Lifestyle, surf, travel y mucho más.</p>
+    <div class="hero-ctas">
+      <a href="#contact" class="btn-primary">Trabajemos juntas</a>
+      <a href="#portfolio" class="btn-secondary">Ver portfolio</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-image-area">
+      <img src="IMG-20250624-WA0093.jpg" alt="Alikey - UGC Creator">
+      <div class="hero-waves">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+          <path d="M0,60 C200,120 400,0 600,60 C800,120 1000,0 1200,60 L1200,120 L0,120 Z" fill="#f5f0e8" opacity="0.15"/>
+          <path d="M0,80 C300,40 600,100 900,60 C1050,40 1150,80 1200,70 L1200,120 L0,120 Z" fill="#f5f0e8" opacity="0.1"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <span class="stat-number">7K+</span>
+    <span class="stat-label">Views máximos</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <span class="stat-number">300+</span>
+    <span class="stat-label">Views mínimos</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <span class="stat-number">2</span>
+    <span class="stat-label">Marcas colaboradas</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <span class="stat-number">3</span>
+    <span class="stat-label">Idiomas</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <span class="stat-number">4</span>
+    <span class="stat-label">Plataformas activas</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-image-box">
+    <div class="about-img-main"><img src="Surfpuente.jpg" alt="Alikey con tabla de surf"></div>
+    <div class="about-img-accent"><img src="IMG-20260328-WA0067.jpg" alt="Alikey creando contenido"></div>
+  </div>
+  <div class="about-content">
+    <p class="section-label">Sobre mí</p>
+    <h2 class="section-title">Creadora de<br>contenido <em>con alma</em></h2>
+    <p>Soy Alicia, creadora de contenido UGC desde Cádiz. Combino mi amor por el océano, los viajes y el estilo de vida para crear piezas visuales que cuentan historias reales y generan conexión genuina.</p>
+    <p>Con experiencia colaborando con marcas de joyería y lifestyle, entiendo lo que una empresa necesita: contenido auténtico, bien ejecutado y que convierte.</p>
+    <p>Creo para personas reales, en su idioma y con su energía.</p>
+    <div class="languages">
+      <span class="lang-tag">🇪🇸 Español</span>
+      <span class="lang-tag">🇬🇧 English</span>
+      <span class="lang-tag">🇰🇷 한국어 (básico)</span>
+    </div>
+  </div>
+</section>
+
+<!-- NICHES -->
+<section id="niches">
+  <p class="section-label">Mis nichos</p>
+  <h2 class="section-title">Contenido que <em>hablo</em> con naturalidad</h2>
+  <div class="niches-grid">
+    <div class="niche-card">
+      <span class="niche-emoji">🌊</span>
+      <h3 class="niche-name">Surf & Deporte</h3>
+      <p class="niche-desc">Contenido activo y con energía desde la orilla. Estilo de vida deportivo, rutinas y la cultura del mar.</p>
+    </div>
+    <div class="niche-card">
+      <span class="niche-emoji">✈️</span>
+      <h3 class="niche-name">Travel</h3>
+      <p class="niche-desc">Experiencias de viaje que inspiran. Desde rincones de Andalucía hasta destinos internacionales.</p>
+    </div>
+    <div class="niche-card">
+      <span class="niche-emoji">☀️</span>
+      <h3 class="niche-name">Lifestyle</h3>
+      <p class="niche-desc">El día a día convertido en contenido deseable. Rutinas, momentos cotidianos y estética de vida.</p>
+    </div>
+    <div class="niche-card">
+      <span class="niche-emoji">🛍️</span>
+      <h3 class="niche-name">Hauls & Moda</h3>
+      <p class="niche-desc">Reviews honestas y hauls visuales que conectan productos con personas reales.</p>
+    </div>
+    <div class="niche-card">
+      <span class="niche-emoji">🍽️</span>
+      <h3 class="niche-name">Food</h3>
+      <p class="niche-desc">Descubriendo sabores con la cámara. Restaurantes, recetas y la gastronomía mediterránea como telón de fondo.</p>
+    </div>
+    <div class="niche-card">
+      <span class="niche-emoji">✨</span>
+      <h3 class="niche-name">Skincare & Beauty</h3>
+      <p class="niche-desc">Rutinas de belleza naturales y honestas. Reviews sin filtro para pieles reales.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+  <div class="portfolio-intro">
+    <div>
+      <p class="section-label">Portfolio</p>
+      <h2 class="section-title">Contenido que<br><em>conecta</em> de verdad</h2>
+      <p class="portfolio-text"><p>Cada pieza que creo tiene un propósito: mostrar el producto o experiencia de forma auténtica y visualmente atractiva. Aquí puedes ver una muestra de mis tipos de contenido.</p></p>
+    </div>
+    <div class="portfolio-links">
+      <a href="https://www.tiktok.com/@alikey" target="_blank" class="platform-link">
+        <span class="platform-icon">🎵</span>
+        <span class="platform-name">TikTok · @alikey</span>
+        <span class="platform-arrow">→</span>
+      </a>
+      <a href="https://www.instagram.com/alikey" target="_blank" class="platform-link">
+        <span class="platform-icon">📸</span>
+        <span class="platform-name">Instagram · @alikey</span>
+        <span class="platform-arrow">→</span>
+      </a>
+      <a href="https://www.threads.net/@alikey" target="_blank" class="platform-link">
+        <span class="platform-icon">🧵</span>
+        <span class="platform-name">Threads · @alikey</span>
+        <span class="platform-arrow">→</span>
+      </a>
+      <a href="#" class="platform-link" style="opacity:0.5; cursor:default;">
+        <span class="platform-icon">▶️</span>
+        <span class="platform-name">YouTube · Próximamente</span>
+        <span class="platform-arrow">—</span>
+      </a>
+    </div>
+  </div>
+  <div class="portfolio-grid">
+    <div class="portfolio-item">
+      <img src="Picsart_26-04-21_00-54-12-805.jpg" alt="Surf" style="width:100%;height:100%;object-fit:cover;">
+      <div class="portfolio-overlay">
+        <span class="po-type">Deporte</span>
+        <span class="po-title">Surf en Cádiz</span>
+      </div>
+    </div>
+    <div class="portfolio-item">
+      <img src="IMG-20240927-WA0008.jpg" alt="París" style="width:100%;height:100%;object-fit:cover;">
+      <div class="portfolio-overlay">
+        <span class="po-type">Travel</span>
+        <span class="po-title">París, Francia</span>
+      </div>
+    </div>
+    <div class="portfolio-item">
+      <img src="IMG_20230929_200734_245.jpg" alt="Paddle surf atardecer" style="width:100%;height:100%;object-fit:cover;">
+      <div class="portfolio-overlay">
+        <span class="po-type">Lifestyle</span>
+        <span class="po-title">Paddle surf al atardecer</span>
+      </div>
+    </div>
+    <div class="portfolio-item">
+      <img src="1000085206-01.jpg" alt="Buceo" style="width:100%;height:100%;object-fit:cover;">
+      <div class="portfolio-overlay">
+        <span class="po-type">Experiencia</span>
+        <span class="po-title">Buceo</span>
+      </div>
+    </div>
+    <div class="portfolio-item">
+      <img src="Surfagua.jpg" alt="Surf" style="width:100%;height:100%;object-fit:cover;">
+      <div class="portfolio-overlay">
+        <span class="po-type">Deporte</span>
+        <span class="po-title">Surf en Cádiz</span>
+      </div>
+    </div>
+    <div class="portfolio-item">
+      <img src="IMG-20230813-WA0008.jpg" alt="Paddle surf" style="width:100%;height:100%;object-fit:cover;">
+      <div class="portfolio-overlay">
+        <span class="po-type">Deporte</span>
+        <span class="po-title">Paddle Surf</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTENT TYPES -->
+<section id="services">
+  <p class="section-label">Formatos</p>
+  <h2 class="section-title">Tipos de contenido<br>que <em>produzco</em></h2>
+  <div class="services-grid">
+    <div class="service-item">
+      <span class="si-icon">🎬</span>
+      <h3 class="si-title">Reels</h3>
+      <p class="si-desc">Videos cortos optimizados para Instagram y TikTok, editados con ritmo y estética cuidada.</p>
+    </div>
+    <div class="service-item">
+      <span class="si-icon">🎙️</span>
+      <h3 class="si-title">Storytime</h3>
+      <p class="si-desc">Narraciones personales que conectan emocionalmente y mantienen al espectador enganchado.</p>
+    </div>
+    <div class="service-item">
+      <span class="si-icon">🛍️</span>
+      <h3 class="si-title">Hauls & Reviews</h3>
+      <p class="si-desc">Presentación honesta de productos con storytelling natural que inspira a comprar.</p>
+    </div>
+    <div class="service-item">
+      <span class="si-icon">🌅</span>
+      <h3 class="si-title">Vídeos de experiencias</h3>
+      <p class="si-desc">Contenido inmersivo que hace vivir un lugar, momento o producto al espectador.</p>
+    </div>
+  </div>
+</section>
+
+<!-- BRANDS -->
+<section id="brands">
+  <p class="section-label">Colaboraciones</p>
+  <h2 class="section-title">Marcas con las que<br>he <em>trabajado</em></h2>
+  <div class="brands-grid">
+    <div class="brand-item">
+      <img src="VID_20260317_061247_719.jpg" alt="Lolita París" class="brand-photo">
+      <span class="brand-name">Lolita París</span>
+      <span class="brand-cat">Joyería</span>
+    </div>
+    <div class="brand-item">
+      <img src="IMG-20260407-WA0087.jpg" alt="Ocean Wave Jewellery" class="brand-photo">
+      <span class="brand-name">Ocean Wave Jewellery</span>
+      <span class="brand-cat">Joyería & Ropa</span>
+    </div>
+    <div class="brand-item">
+      <img src="IMG-20260407-WA0083.jpg" alt="Ocean Wave joyas" class="brand-photo">
+      <span class="brand-name">Ocean Wave Jewellery</span>
+      <span class="brand-cat">Joyería & Accesorios</span>
+    </div>
+  </div>
+  <p class="brands-note">Abierta a nuevas colaboraciones — hablemos</p>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <p class="section-label">Contacto</p>
+  <h2 class="section-title">¿Lista para crear<br>algo <em>bonito juntas</em>?</h2>
+  <p class="contact-sub">Si tienes una marca y buscas contenido auténtico que conecte, estoy aquí. Cuéntame tu proyecto y lo hacemos realidad.</p>
+  <a href="mailto:alikeyy.08@gmail.com" class="contact-email">alikeyy.08@gmail.com</a>
+  <div class="social-row">
+    <a href="https://www.tiktok.com/@alikey" target="_blank" class="social-link">🎵 TikTok</a>
+    <a href="https://www.instagram.com/alikey" target="_blank" class="social-link">📸 Instagram</a>
+    <a href="https://www.threads.net/@alikey" target="_blank" class="social-link">🧵 Threads</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-logo">Alikey</span>
+  <span>© 2025 Alicia Parrado · San Fernando, Cádiz · UGC Creator</span>
+  <span>Made with 🌊</span>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.niche-card, .service-item, .brand-item, .portfolio-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
